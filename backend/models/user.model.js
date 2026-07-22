@@ -11,7 +11,12 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: ['STUDENT', 'TEACHER', 'ADMIN']
+    },
+    accountId: {
+        type: mongoose.Types.ObjectId
     }
+}, {
+    timestamps: true
 });
 
 const userModel = mongoose.model('User', userSchema);

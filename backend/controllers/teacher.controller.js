@@ -32,7 +32,10 @@ const teacherController = {
                 address,
                 identity,
                 dob,
+                startDate,
+                endDate,
                 teacherPositionsId,
+                teacherPositions,
                 degrees
             } = req.body;
 
@@ -51,38 +54,36 @@ const teacherController = {
                 });
             }
 
-            // Generate unique random numeric code
             let isUnique = false;
             let code = "";
             while (!isUnique) {
-                code = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+                code = (Math.floor(Math.random() * (9000000000)) + 1000000000).toString();
                 const existingTeacher = await teacherModel.findOne({ code });
                 if (!existingTeacher) {
                     isUnique = true;
                 }
             }
 
-            // Create User document
             const newUser = new userModel({
-                name,
                 email,
-                phoneNumber: phoneNumber || phone || null,
                 address: address || null,
-                identity: identity || null,
                 dob: dob ? new Date(dob) : null,
-                isDeleted: false,
-                role: "TEACHER"
+                name: name,
+                identity: identity || null,
+                phoneNumber: phoneNumber || null,
+                role: "TEACHER",
+                isDeleted: false
             });
             await newUser.save();
 
-            // Create Teacher document
             const newTeacher = new teacherModel({
-                userId: newUser._id,
                 code,
+                startDate: startDate ? new Date(startDate) : undefined,
                 isActive: true,
                 isDeleted: false,
+                userId: newUser._id,
                 teacherPositionsId: teacherPositionsId || teacherPositions || [],
-                degrees: degrees || []
+                degrees: degrees || {}
             });
             await newTeacher.save();
 
@@ -95,9 +96,12 @@ const teacherController = {
                     email: newUser.email,
                     phoneNumber: newUser.phoneNumber,
                     address: newUser.address,
+                    identity: newUser.identity,
+                    dob: newUser.dob,
                     isActive: newTeacher.isActive,
-                    teacherPositions: newTeacher.teacherPositionsId,
-                    degrees: newTeacher.degrees
+                    teacherPositionsId: newTeacher.teacherPositionsId,
+                    degrees: newTeacher.degrees,
+                    startDate: newTeacher.startDate,
                 }
             });
         } catch (error) {

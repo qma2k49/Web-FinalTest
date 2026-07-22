@@ -10,7 +10,7 @@ const teacherSchema = new mongoose.Schema({
     code: String,
     startDate: Date,
     endDate: Date,
-    teacherPositions: {
+    teacherPositionsId: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'TeacherPosition'
     },
@@ -21,6 +21,8 @@ const teacherSchema = new mongoose.Schema({
         year: Number,
         isGraduated: Boolean
     }
+}, {
+    timestamps: true
 });
 
 const teacherModel = mongoose.model('Teacher', teacherSchema);

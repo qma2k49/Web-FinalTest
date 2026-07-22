@@ -6,6 +6,8 @@ const teacherPositionSchema = new mongoose.Schema({
     des: String,
     isActive: Boolean,
     isDeleted: Boolean,
+}, {
+    timestamps: true
 });
 
 const teacherPositionModel = mongoose.model('TeacherPosition', teacherPositionSchema);
