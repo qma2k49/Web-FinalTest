@@ -7,6 +7,7 @@ const app = express();
 
 app.use(express.json());
 
+// API Teachers
 app.use('/teachers', teacherRouter);
 
 connectDB();
