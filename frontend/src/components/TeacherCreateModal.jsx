@@ -37,7 +37,7 @@ const TeacherCreateModal = ({ isOpen, onClose, onSubmit }) => {
         }}
         className="mt-4"
       >
-        {/* Full Name */}
+
         <Form.Item
           name="name"
           label={<span className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Họ và tên <span className="text-rose-500">*</span></span>}
@@ -47,7 +47,6 @@ const TeacherCreateModal = ({ isOpen, onClose, onSubmit }) => {
         </Form.Item>
 
         <div className="grid grid-cols-2 gap-4">
-          {/* Email */}
           <Form.Item
             name="email"
             label={<span className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Email liên hệ <span className="text-rose-500">*</span></span>}
@@ -59,7 +58,6 @@ const TeacherCreateModal = ({ isOpen, onClose, onSubmit }) => {
             <Input size="large" placeholder="name@school.edu.vn" className="!rounded-xl" />
           </Form.Item>
 
-          {/* Phone */}
           <Form.Item
             name="phone"
             label={<span className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Số điện thoại <span className="text-rose-500">*</span></span>}
@@ -70,7 +68,6 @@ const TeacherCreateModal = ({ isOpen, onClose, onSubmit }) => {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          {/* Degree */}
           <Form.Item
             name="degree"
             label={<span className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Trình độ học vấn</span>}
@@ -87,7 +84,6 @@ const TeacherCreateModal = ({ isOpen, onClose, onSubmit }) => {
             />
           </Form.Item>
 
-          {/* Major */}
           <Form.Item
             name="major"
             label={<span className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Chuyên ngành <span className="text-rose-500">*</span></span>}
@@ -101,7 +97,6 @@ const TeacherCreateModal = ({ isOpen, onClose, onSubmit }) => {
 
 
 
-          {/* Work Duty Role */}
           <Form.Item
             name="workRole"
             label={<span className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">TT công tác (Nhiệm vụ)</span>}
@@ -110,7 +105,6 @@ const TeacherCreateModal = ({ isOpen, onClose, onSubmit }) => {
           </Form.Item>
         </div>
 
-        {/* Address */}
         <Form.Item
           name="address"
           label={<span className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Địa chỉ thường trú <span className="text-rose-500">*</span></span>}
@@ -123,7 +117,6 @@ const TeacherCreateModal = ({ isOpen, onClose, onSubmit }) => {
           <Input />
         </Form.Item>
 
-        {/* Footer buttons */}
         <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 mt-6">
           <Button
             type="default"

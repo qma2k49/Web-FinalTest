@@ -23,7 +23,6 @@ const TeacherDetailModal = ({ teacher, onClose }) => {
     >
       {teacher && (
         <div className="flex flex-col gap-6 text-sm select-none">
-          {/* Avatar and name header */}
           <div className="flex items-center gap-4 border-b border-gray-50 pb-5">
             <img
               src={teacher.avatar}
@@ -39,7 +38,6 @@ const TeacherDetailModal = ({ teacher, onClose }) => {
             </div>
           </div>
 
-          {/* Details layout grid */}
           <div className="flex flex-col gap-3">
             <div className="bg-gray-50/50 p-3.5 rounded-xl border border-gray-100/70 flex justify-between items-center">
               <span className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Mã giáo viên</span>
