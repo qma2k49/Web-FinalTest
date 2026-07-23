@@ -12,6 +12,7 @@ import AdminSidebar from './components/AdminSibebar';
 import TeacherTable from './components/TeacherTable';
 import TeacherDetailModal from './components/TeacherDetailModal';
 import TeacherCreateModal from './components/TeacherCreateModal';
+import WorkPositionsView from './components/WorkPositionsView';
 
 // Complete mock data for 22 teachers matching the mockup screenshot names and data
 const INITIAL_TEACHERS = [
@@ -448,7 +449,9 @@ const App = () => {
             </div>
 
             {/* Tab Content Router */}
-            {currentTab !== 'giaoVien' ? (
+            {currentTab === 'viTriCongTac' ? (
+              <WorkPositionsView />
+            ) : currentTab !== 'giaoVien' ? (
               <div className="flex-1 bg-white border border-gray-100 rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm">
                 <div className="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center mb-4">
                   <AlertCircle className="w-8 h-8" />
