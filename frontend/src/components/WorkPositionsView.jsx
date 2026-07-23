@@ -107,6 +107,7 @@ const WorkPositionsView = () => {
     } else {
       // Create mode using POST API
       axios.post(`/teacher-positions`, {
+        code: values.code,
         name: values.name,
         des: values.des,
         isActive: statusActive

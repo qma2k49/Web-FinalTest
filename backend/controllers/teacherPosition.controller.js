@@ -18,21 +18,18 @@ const teacherPositionController = {
 
     createNewPosition: async (req, res) => {
         try {
-            const { name, des } = req.body;
+            const { name, code, des } = req.body;
             if (!name) {
                 return res.status(400).json({
                     message: "Vui lòng nhập đầy đủ thông tin tên chức vụ"
                 });
             }
 
-            let isUnique = false;
-            let code = "";
-            while (!isUnique) {
-                code = (Math.floor(Math.random() * (9000000000)) + 1000000000).toString();
-                const existingPosition = await teacherPositionModel.findOne({ code });
-                if (!existingPosition) {
-                    isUnique = true;
-                }
+            const existingPosition = await teacherPositionModel.findOne({ code });
+            if (existingPosition) {
+                return res.status(400).json({
+                    message: "Chức vụ đã tồn tại"
+                });
             }
 
             const newPosition = new teacherPositionModel({
