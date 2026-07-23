@@ -60,6 +60,40 @@ const teacherPositionController = {
                 error: error.message
             });
         }
+    },
+
+    updatePosition: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { name, des, isActive } = req.body;
+            if (!name) {
+                return res.status(400).json({
+                    message: "Vui lòng nhập đầy đủ thông tin tên chức vụ"
+                });
+            }
+
+            const updated = await teacherPositionModel.findByIdAndUpdate(
+                id,
+                { name, des, isActive },
+                { new: true }
+            );
+
+            if (!updated) {
+                return res.status(404).json({
+                    message: "Không tìm thấy chức vụ cần cập nhật"
+                });
+            }
+
+            return res.status(200).json({
+                data: updated,
+                message: "Cập nhật chức vụ thành công"
+            });
+        } catch (error) {
+            return res.status(500).json({
+                message: "Lỗi máy chủ nội bộ",
+                error: error.message
+            });
+        }
     }
 }
 

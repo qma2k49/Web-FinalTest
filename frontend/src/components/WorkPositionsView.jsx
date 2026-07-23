@@ -1,38 +1,63 @@
-import React, { useState } from 'react';
-import { Table, Drawer, Form, Input, Button } from 'antd';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Table, Drawer, Form, Input } from 'antd';
 import { Plus, RotateCw, Settings, X, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
-const INITIAL_POSITIONS = [
-  { id: '1', code: 'TTS', name: 'Thực tập sinh', isActive: true, des: 'Giáo viên thực tập sinh tại trường' },
-  { id: '2', code: 'GVBM', name: 'Giáo viên bộ môn', isActive: true, des: 'Giáo viên bộ môn giảng dạy tại trường' },
-  { id: '3', code: 'TBM', name: 'Trưởng bộ môn', isActive: true, des: 'Trưởng bộ môn giảng dạy tại trường' },
-  { id: '4', code: 'HT', name: 'Hiệu trưởng', isActive: true, des: 'Hiệu trưởng tại trường học' },
-  { id: '5', code: 'HP', name: 'Hiệu phó', isActive: true, des: 'Phó hiệu trưởng tại trường học' },
-  { id: '6', code: 'CBYT', name: 'Cán bộ Y Tế', isActive: true, des: 'Hỗ trợ công việc Y Tế' }
-];
-
 const WorkPositionsView = () => {
   const [form] = Form.useForm();
-  const [positions, setPositions] = useState(INITIAL_POSITIONS);
+  const [positions, setPositions] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Drawer states
   const [showDrawer, setShowDrawer] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [statusActive, setStatusActive] = useState(true);
 
-  // Refresh trigger simulation
+  // Fetch from database
+  const fetchPositions = () => {
+    setLoading(true);
+    axios.get('/teacher-positions')
+      .then((res) => {
+        const data = res.data.data || [];
+        setPositions(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching positions:", err);
+        toast.error("Không thể tải danh sách chức vụ từ máy chủ");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchPositions();
+  }, []);
+
+  // Refresh handler
   const handleRefresh = () => {
     setIsRefreshing(true);
     toast.promise(
-      new Promise((resolve) => setTimeout(resolve, 500)),
+      new Promise((resolve, reject) => {
+        axios.get('/teacher-positions')
+          .then((res) => {
+            const data = res.data.data || [];
+            setPositions(data);
+            resolve();
+          })
+          .catch((err) => {
+            console.error(err);
+            reject(err);
+          })
+          .finally(() => {
+            setIsRefreshing(false);
+          });
+      }),
       {
         loading: 'Đang làm mới danh sách...',
-        success: () => {
-          setIsRefreshing(false);
-          return 'Đã làm mới danh sách chức vụ!';
-        },
+        success: 'Đã làm mới danh sách chức vụ!',
         error: 'Có lỗi xảy ra khi làm mới'
       }
     );
@@ -64,26 +89,38 @@ const WorkPositionsView = () => {
 
   const handleFinish = (values) => {
     if (editingRecord) {
-      // Edit mode
-      setPositions(
-        positions.map((p) =>
-          p.id === editingRecord.id ? { ...p, ...values, isActive: statusActive } : p
-        )
-      );
-      toast.success(`Cập nhật vị trí "${values.name}" thành công!`);
-    } else {
-      // Create mode
-      const newPos = {
-        id: String(Date.now()),
-        code: values.code,
+      // Edit mode using PUT API
+      axios.put(`/teacher-positions/${editingRecord._id}`, {
         name: values.name,
         des: values.des,
         isActive: statusActive
-      };
-      setPositions([...positions, newPos]);
-      toast.success(`Tạo mới vị trí "${values.name}" thành công!`);
+      })
+      .then(() => {
+        toast.success(`Cập nhật vị trí "${values.name}" thành công!`);
+        handleCloseDrawer();
+        fetchPositions();
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(err.response?.data?.message || "Lỗi khi cập nhật chức vụ");
+      });
+    } else {
+      // Create mode using POST API
+      axios.post(`/teacher-positions`, {
+        name: values.name,
+        des: values.des,
+        isActive: statusActive
+      })
+      .then(() => {
+        toast.success(`Tạo mới vị trí "${values.name}" thành công!`);
+        handleCloseDrawer();
+        fetchPositions();
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(err.response?.data?.message || "Lỗi khi tạo mới chức vụ");
+      });
     }
-    handleCloseDrawer();
   };
 
   // Table columns definition
@@ -115,8 +152,9 @@ const WorkPositionsView = () => {
       key: 'isActive',
       width: '15%',
       render: (active) => (
-        <span className={`inline-block px-2.5 py-0.5 rounded text-[11px] font-bold text-white leading-5 select-none ${active ? 'bg-emerald-500' : 'bg-rose-500'
-          }`}>
+        <span className={`inline-block px-2.5 py-0.5 rounded text-[11px] font-bold text-white leading-5 select-none ${
+          active ? 'bg-emerald-500' : 'bg-rose-500'
+        }`}>
           {active ? 'Hoạt động' : 'Ngừng'}
         </span>
       )
@@ -197,7 +235,6 @@ const WorkPositionsView = () => {
 
       {/* Control & Query Bar */}
       <div className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center justify-end select-none">
-
         <div className="flex items-center gap-3">
           <button
             onClick={handleOpenCreate}
@@ -222,8 +259,9 @@ const WorkPositionsView = () => {
         <Table
           dataSource={positions}
           columns={columns}
-          rowKey="id"
+          rowKey="_id"
           pagination={false}
+          loading={loading}
         />
       </div>
 
@@ -255,7 +293,7 @@ const WorkPositionsView = () => {
             label={<span className="text-[13px] font-bold text-slate-700">Mã <span className="text-rose-500">*</span></span>}
             rules={[{ required: true, message: 'Vui lòng điền mã vị trí' }]}
           >
-            <Input size="large" placeholder="Nhập mã vị trí (VD: GVBM)" />
+            <Input size="large" placeholder="Nhập mã vị trí (VD: GVBM)" disabled={!!editingRecord} />
           </Form.Item>
 
           {/* Name Field */}
@@ -283,20 +321,22 @@ const WorkPositionsView = () => {
               <button
                 type="button"
                 onClick={() => setStatusActive(true)}
-                className={`px-4.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${statusActive
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100'
-                  : 'bg-white border border-slate-200 text-slate-500 hover:border-slate-350'
-                  }`}
+                className={`px-4.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  statusActive
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100'
+                    : 'bg-white border border-slate-200 text-slate-500 hover:border-slate-350'
+                }`}
               >
                 Hoạt động
               </button>
               <button
                 type="button"
                 onClick={() => setStatusActive(false)}
-                className={`px-4.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${!statusActive
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100'
-                  : 'bg-white border border-slate-200 text-slate-500 hover:border-slate-350'
-                  }`}
+                className={`px-4.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  !statusActive
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100'
+                    : 'bg-white border border-slate-200 text-slate-500 hover:border-slate-350'
+                }`}
               >
                 Ngừng
               </button>

@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
 import { Modal, Form, Input, Select, DatePicker, Table } from 'antd';
 import { X, UploadCloud, Save, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -32,6 +33,20 @@ const TeacherCreateModal = ({ isOpen, onClose, onSubmit }) => {
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [fileName, setFileName] = useState('');
   const [degreesList, setDegreesList] = useState([]);
+  const [positionsList, setPositionsList] = useState([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      axios.get('/teacher-positions')
+        .then((res) => {
+          const activePos = res.data.data || [];
+          setPositionsList(activePos);
+        })
+        .catch((err) => {
+          console.error("Error fetching positions:", err);
+        });
+    }
+  }, [isOpen]);
   const [newDegree, setNewDegree] = useState({
     degreeType: 'Cử nhân',
     school: '',
@@ -77,19 +92,42 @@ const TeacherCreateModal = ({ isOpen, onClose, onSubmit }) => {
 
   const handleFinish = (values) => {
     const highest = getHighestDegree();
-    const workRole = values.workPositions?.length > 0 ? values.workPositions.join(', ') : 'Giáo viên bộ môn';
+    const workRole = values.workPositions && values.workPositions.length > 0
+      ? positionsList
+          .filter(p => values.workPositions.includes(p._id))
+          .map(p => p.name)
+          .join(', ')
+      : 'Giáo viên bộ môn';
+
+    const formattedDate = values.dob ? values.dob.format('DD/MM/YYYY') : '';
+
+    const backendDegrees = degreesList.map((d) => {
+      let dbType = d.degreeType;
+      if (d.degreeType === 'Cử nhân') dbType = 'Bachelor';
+      if (d.degreeType === 'Thạc sĩ') dbType = 'Master';
+      if (d.degreeType === 'Tiến sĩ') dbType = 'Doctorate';
+      
+      return {
+        type: dbType,
+        school: d.school,
+        major: d.major,
+        year: parseInt(d.year) || new Date().getFullYear(),
+        isGraduated: d.status === 'Hoàn thành'
+      };
+    });
 
     onSubmit({
       name: values.name,
       email: values.email,
       phone: values.phone,
       address: values.address,
-      dob: values.dob ? values.dob.format('DD/MM/YYYY') : '',
-      cccd: values.cccd,
+      dob: formattedDate,
+      identity: values.cccd,
+      teacherPositionsId: values.workPositions,
+      degrees: backendDegrees,
       workRole: workRole,
       degree: highest.degree,
       major: highest.major,
-      subject: 'N/A',
       status: 'Đang công tác',
       avatar: avatarUrl || undefined
     });
@@ -326,13 +364,7 @@ const TeacherCreateModal = ({ isOpen, onClose, onSubmit }) => {
             placeholder="Chọn các vị trí công tác"
             size="large"
             className="w-full"
-            options={[
-              { value: 'Giáo viên bộ môn', label: 'Giáo viên bộ môn' },
-              { value: 'Giáo viên chủ nhiệm', label: 'Giáo viên chủ nhiệm' },
-              { value: 'Trưởng bộ môn', label: 'Trưởng bộ môn' },
-              { value: 'Phó bộ môn', label: 'Phó bộ môn' },
-              { value: 'Giáo viên trợ giảng', label: 'Giáo viên trợ giảng' }
-            ]}
+            options={positionsList.map(p => ({ value: p._id, label: p.name }))}
           />
         </Form.Item>
 

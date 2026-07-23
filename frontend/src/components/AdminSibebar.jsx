@@ -79,10 +79,10 @@ const AdminSidebar = ({ currentTab, setCurrentTab }) => {
                                     }
                                 }}
                                 className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${item.interactive
-                                        ? isSelected && !item.hasSubmenu
-                                            ? 'bg-indigo-50 text-indigo-600 shadow-sm shadow-indigo-100/50 cursor-pointer'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-600 cursor-pointer'
-                                        : 'text-gray-400 cursor-default'
+                                    ? isSelected && !item.hasSubmenu
+                                        ? 'bg-indigo-50 text-indigo-600 shadow-sm shadow-indigo-100/50 cursor-pointer'
+                                        : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-600 cursor-pointer'
+                                    : 'text-gray-400 cursor-default'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
@@ -103,8 +103,8 @@ const AdminSidebar = ({ currentTab, setCurrentTab }) => {
                                                 key={subItem.id}
                                                 onClick={() => setCurrentTab(subItem.id)}
                                                 className={`w-full text-left px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-150 cursor-pointer ${isSubSelected
-                                                        ? 'bg-indigo-50 text-indigo-600 font-bold'
-                                                        : 'text-gray-500 hover:text-indigo-600 hover:bg-gray-50/50'
+                                                    ? 'bg-indigo-50 text-indigo-600 font-bold'
+                                                    : 'text-gray-500 hover:text-indigo-600 hover:bg-gray-50/50'
                                                     }`}
                                             >
                                                 {subItem.label}
@@ -116,10 +116,6 @@ const AdminSidebar = ({ currentTab, setCurrentTab }) => {
                         </div>
                     );
                 })}
-            </div>
-
-            <div className="px-6 py-4 border-t border-gray-50 text-center">
-                <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Học kỳ I • 2026-2027</p>
             </div>
         </aside>
     );

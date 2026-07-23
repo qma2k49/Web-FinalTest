@@ -4,9 +4,37 @@ import userModel from '../models/user.model.js'
 const teacherController = {
     getAllTeacher: async (req, res) => {
         try {
-            const { page, limit } = req.query;
-            const teachers = await teacherModel.find().skip((page - 1) * limit).limit(limit);
-            const total = await teacherModel.countDocuments();
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            const search = req.query.search || '';
+
+            let query = {};
+            if (search) {
+                // Find users matching search term (name, email, or phone)
+                const matchingUsers = await userModel.find({
+                    $or: [
+                        { name: { $regex: search, $options: 'i' } },
+                        { email: { $regex: search, $options: 'i' } },
+                        { phoneNumber: { $regex: search, $options: 'i' } }
+                    ]
+                });
+                
+                // Query teachers matching user IDs or teacher code directly
+                query = {
+                    $or: [
+                        { userId: { $in: matchingUsers.map(u => u._id) } },
+                        { code: { $regex: search, $options: 'i' } }
+                    ]
+                };
+            }
+
+            const teachers = await teacherModel.find(query)
+                .populate('userId')
+                .populate('teacherPositionsId')
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            const total = await teacherModel.countDocuments(query);
             return res.status(200).json({
                 data: teachers,
                 message: "Lấy danh sách giảng viên thành công",
@@ -15,8 +43,9 @@ const teacherController = {
                     limit: limit,
                     total: total,
                 }
-            })
+            });
         } catch (error) {
+            console.error("Error in getAllTeacher:", error);
             return res.status(500).json({
                 message: "Lỗi máy chủ nội bộ",
             });
@@ -83,7 +112,7 @@ const teacherController = {
                 isDeleted: false,
                 userId: newUser._id,
                 teacherPositionsId: teacherPositionsId || teacherPositions || [],
-                degrees: degrees || {}
+                degrees: degrees || []
             });
             await newTeacher.save();
 

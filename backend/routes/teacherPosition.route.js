@@ -5,5 +5,6 @@ const teacherPositionRouter = Router();
 
 teacherPositionRouter.get('/', teacherPositionController.getAllPositions);
 teacherPositionRouter.post('/', teacherPositionController.createNewPosition);
+teacherPositionRouter.put('/:id', teacherPositionController.updatePosition);
 
 export default teacherPositionRouter;

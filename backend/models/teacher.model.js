@@ -14,13 +14,13 @@ const teacherSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'TeacherPosition'
     },
-    degrees: {
+    degrees: [{
         type: { type: String },
         school: String,
         major: String,
         year: Number,
         isGraduated: Boolean
-    }
+    }]
 }, {
     timestamps: true
 });
